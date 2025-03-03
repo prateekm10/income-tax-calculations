@@ -1,3 +1,7 @@
+# =========================================
+# tax_calculations.py
+# =========================================
+
 def calculate_old_regime_2025(
     salary: float,
     house_property: float,
@@ -9,6 +13,9 @@ def calculate_old_regime_2025(
     ded_80g: float,
     ded_other: float
 ) -> dict:
+    """
+    Old Regime calculation for FY 2025-26
+    """
 
     # 1. Gross Income (excluding digital assets)
     gross_income_non_digital = salary + house_property + other_income
@@ -39,7 +46,7 @@ def calculate_old_regime_2025(
     # 6. Slab-based tax (Old Regime)
     slab_tax = 0
     remaining = taxable_income
-    slab_breakup = []  # <--- We'll store each slab's info here
+    slab_breakup = []
 
     # Slab 1: 0% on 0-2.5L
     slab_1 = min(250000, remaining)
@@ -105,16 +112,21 @@ def calculate_old_regime_2025(
     # 10. Final total
     total_tax = total_tax_before_cess + cess
 
+    # === NEW: net income after tax ===
+    gross_income = salary + house_property + other_income + digital_assets
+    net_income_after_tax = gross_income - total_tax
+
     return {
-        "gross_income": salary + house_property + other_income + digital_assets,
+        "gross_income": gross_income,
         "total_deductions": total_deductions,
         "taxable_income": taxable_income,
         "income_tax": slab_tax,
         "digital_assets_tax": digital_assets_tax,
         "cess": cess,
         "total_tax": total_tax,
-        "slab_breakup": slab_breakup,  # <--- The new key
-        "standard_deduction": standard_deduction  # if you want to show it
+        "net_income_after_tax": net_income_after_tax,  # <-- ADDED
+        "slab_breakup": slab_breakup,
+        "standard_deduction": standard_deduction
     }
 
 
@@ -124,6 +136,9 @@ def calculate_new_regime_2025(
     other_income: float,
     digital_assets: float
 ) -> dict:
+    """
+    New Regime calculation for FY 2025-26
+    """
 
     standard_deduction = 75000 if salary > 0 else 0
     gross_income_non_digital = salary + house_property + other_income
@@ -245,8 +260,12 @@ def calculate_new_regime_2025(
     cess = tax_after_rebate * 0.04
     total_tax = tax_after_rebate + cess
 
+    # === NEW: net income after tax ===
+    gross_income = salary + house_property + other_income + digital_assets
+    net_income_after_tax = gross_income - total_tax
+
     return {
-        "gross_income": salary + house_property + other_income + digital_assets,
+        "gross_income": gross_income,
         "standard_deduction": standard_deduction,
         "taxable_income": taxable_income,
         "income_tax": slab_tax,
@@ -254,5 +273,6 @@ def calculate_new_regime_2025(
         "rebate": rebate,
         "cess": cess,
         "total_tax": total_tax,
-        "slab_breakup": slab_breakup  # <--- The new key
+        "net_income_after_tax": net_income_after_tax,  # <-- ADDED
+        "slab_breakup": slab_breakup
     }
