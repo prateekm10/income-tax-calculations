@@ -53,7 +53,7 @@ def display_about():
     ## Indian Income Tax Calculator  
     ### Version 1.0  
     This application calculates and compares income tax under both the old and new tax regimes for Indian taxpayers as per FY 2025-26 rules.  
-    Developed using Python and Streamlit.  
+    Developed using Python 
     **Features:**  
     - Calculate tax under both old and new regimes  
     - Compare tax liabilities side by side  

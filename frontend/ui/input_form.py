@@ -122,6 +122,12 @@ def setup_input_form():
                 key="nps_80ccd",
                 help="Additional deduction for NPS contribution (Limit: ₹50,000)."
             )
+            st.number_input(
+            "Education Loan Interest - 80E (₹)",
+            min_value=0.0,
+            key="ded_80e",
+            help="Interest paid on education loans for higher studies (deduction available for up to 8 years)."
+        )
         with colD:
             st.number_input(
                 "Medical Insurance - 80D (max ₹25K/50K) (₹)",
@@ -136,11 +142,19 @@ def setup_input_form():
                 key="donations_80g",
                 help="Donations to approved funds and charitable institutions."
             )
+           #Deduction for Disability - Section 80U
             st.number_input(
-                "Any Other Deductions (₹)",
-                min_value=0.0,
-                key="other_deductions",
-                help="E.g. 80E (education loan), 80EE, 80TTA, etc."
+            "Deduction for Disability - 80U (₹)",
+            min_value=0.0,
+            key="ded_80u",
+            help="Deduction for disabled individuals. Maximum limit: ₹75,000 (40-80% disability) or ₹1,25,000 (80%+ disability)."
+            )
+            #Home Loan Interest (First Time) - Section 80EE
+            st.number_input(
+            "Home Loan Interest (First Time) - 80EE (₹)",
+            min_value=0.0,
+            key="ded_80ee",
+            help="Additional deduction for home loan interest for first-time buyers."
             )
         st.info("Under Old Regime, you can claim multiple deductions but face higher slab rates beyond ₹5 lakh.")
     
@@ -278,6 +292,12 @@ def setup_input_form():
                 key="nps_80ccd",
                 help="Additional deduction for NPS contribution (Limit: ₹50,000)."
             )
+            st.number_input(
+            "Education Loan Interest - 80E (₹)",
+            min_value=0.0,
+            key="ded_80e",
+            help="Interest paid on education loans for higher studies (deduction available for up to 8 years)."
+        )
         with colD:
             st.number_input(
                 "Medical Insurance - 80D (max ₹25K/50K) (₹)",
@@ -293,10 +313,17 @@ def setup_input_form():
                 help="Donations to approved funds and charitable institutions."
             )
             st.number_input(
-                "Any Other Deductions (₹)",
-                min_value=0.0,
-                key="other_deductions",
-                help="E.g. 80E (education loan), 80EE, 80TTA, etc."
+            "Deduction for Disability - 80U (₹)",
+            min_value=0.0,
+            key="ded_80u",
+            help="Deduction for disabled individuals. Maximum limit: ₹75,000 (40-80% disability) or ₹1,25,000 (80%+ disability)."
+            )
+            #Home Loan Interest (First Time) - Section 80EE
+            st.number_input(
+            "Home Loan Interest (First Time) - 80EE (₹)",
+            min_value=0.0,
+            key="ded_80ee",
+            help="Additional deduction for home loan interest for first-time buyers."
             )
         st.info("Under Old Regime, you can claim multiple deductions but face higher slab rates beyond ₹5 lakh.")
     
@@ -336,7 +363,11 @@ def setup_input_form():
             ded_80d=st.session_state.get("medical_insurance_80d", 0.0),
             ded_80ccd=st.session_state.get("nps_80ccd", 0.0),
             ded_80g=st.session_state.get("donations_80g", 0.0),
-            ded_other=st.session_state.get("other_deductions", 0.0)
+            ded_other=st.session_state.get("other_deductions", 0.0),
+            ded_80e=st.session_state.get("ded_80e", 0.0),
+            ded_80u=st.session_state.get("ded_80u", 0.0),
+            ded_80ee=st.session_state.get("ded_80ee", 0.0),
+            home_loan_interest=st.session_state.get("home_loan_interest", 0.0),
         )
 
         # === Save both results in session_state for the comparison tab ===

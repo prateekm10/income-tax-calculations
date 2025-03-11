@@ -1,7 +1,6 @@
 # =========================================
 # tax_calculations.py
 # =========================================
-
 def calculate_old_regime_2025(
     salary: float,
     house_property: float,
@@ -11,10 +10,22 @@ def calculate_old_regime_2025(
     ded_80d: float,
     ded_80ccd: float,
     ded_80g: float,
-    ded_other: float
+    ded_other: float,
+    ded_80e: float,
+    ded_80u: float,
+    ded_80ee: float,
+    home_loan_interest: float
 ) -> dict:
     """
-    Old Regime calculation for FY 2025-26
+    Old Regime calculation for FY 2025-26 with updated deductions:
+    - 80C: max ₹1.5L,
+    - 80D: capped at ₹50K,
+    - 80CCD(1B): max ₹50K,
+    - 80E: Education Loan Interest (no cap applied),
+    - 80U: Deduction for Disability (assumed as entered, can cap if needed),
+    - 80EE: First-time Home Loan Interest (max ₹50K),
+    - Home Loan Interest (regular): max ₹2L,
+    - 80G and Other Deductions as provided.
     """
 
     # 1. Gross Income (excluding digital assets)
@@ -23,19 +34,28 @@ def calculate_old_regime_2025(
     # 2. Standard Deduction (₹50k if salary > 0)
     standard_deduction = 50000 if salary > 0 else 0
 
-    # 3. Cap major deductions
+    # 3. Cap major deductions as per limits
     capped_80c = min(ded_80c, 150000)
     capped_80d = min(ded_80d, 50000)
     capped_80ccd = min(ded_80ccd, 50000)
+    capped_home_loan_interest = min(home_loan_interest, 200000)
+    capped_80ee = min(ded_80ee, 50000)
+    # For 80U, you may optionally cap based on severity;
+    # here we take the full value as entered (or you could use: min(ded_80u, 125000))
+    ded_80u_allowed = ded_80u
 
-    # 4. Sum all deductions
+    # 4. Sum all applicable deductions (adding the new ones)
     total_deductions = (
         standard_deduction +
         capped_80c +
         capped_80d +
         capped_80ccd +
         ded_80g +
-        ded_other
+        ded_other +
+        ded_80e +           # Education Loan Interest (80E)
+        ded_80u_allowed +   # Disability deduction (80U)
+        capped_80ee +       # First-time home loan interest (80EE)
+        capped_home_loan_interest  # Regular housing loan interest
     )
 
     # 5. Taxable Income
@@ -48,7 +68,7 @@ def calculate_old_regime_2025(
     remaining = taxable_income
     slab_breakup = []
 
-    # Slab 1: 0% on 0-2.5L
+    # Slab 1: 0% on ₹0-₹2.5L
     slab_1 = min(250000, remaining)
     slab_breakup.append({
         "range": "₹0 - ₹2.5L",
@@ -58,8 +78,7 @@ def calculate_old_regime_2025(
     })
     remaining -= slab_1
 
-    # Slab 2: 5% on 2.5-5L
-    slab_2_tax = 0
+    # Slab 2: 5% on ₹2.5L-₹5L
     if remaining > 0:
         slab_2 = min(250000, remaining)
         slab_2_tax = slab_2 * 0.05
@@ -72,8 +91,7 @@ def calculate_old_regime_2025(
         slab_tax += slab_2_tax
         remaining -= slab_2
 
-    # Slab 3: 20% on 5-10L
-    slab_3_tax = 0
+    # Slab 3: 20% on ₹5L-₹10L
     if remaining > 0:
         slab_3 = min(500000, remaining)
         slab_3_tax = slab_3 * 0.20
@@ -86,8 +104,7 @@ def calculate_old_regime_2025(
         slab_tax += slab_3_tax
         remaining -= slab_3
 
-    # Slab 4: 30% above 10L
-    slab_4_tax = 0
+    # Slab 4: 30% on income above ₹10L
     if remaining > 0:
         slab_4 = remaining
         slab_4_tax = slab_4 * 0.30
@@ -109,11 +126,13 @@ def calculate_old_regime_2025(
     # 9. Cess @4%
     cess = total_tax_before_cess * 0.04
 
-    # 10. Final total
+    # 10. Final total tax
     total_tax = total_tax_before_cess + cess
 
-    # === NEW: net income after tax ===
+    # Calculate overall gross income (including digital assets)
     gross_income = salary + house_property + other_income + digital_assets
+
+    # === NEW: net income after tax ===
     net_income_after_tax = gross_income - total_tax
 
     return {
@@ -124,7 +143,7 @@ def calculate_old_regime_2025(
         "digital_assets_tax": digital_assets_tax,
         "cess": cess,
         "total_tax": total_tax,
-        "net_income_after_tax": net_income_after_tax,  # <-- ADDED
+        "net_income_after_tax": net_income_after_tax,
         "slab_breakup": slab_breakup,
         "standard_deduction": standard_deduction
     }
